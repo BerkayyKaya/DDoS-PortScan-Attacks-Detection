@@ -2,3 +2,4 @@ siberGuvenlik/*
 data/*
 models/*
 src/.ipynb_checkpoints
+src/catboost_info
