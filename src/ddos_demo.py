@@ -10,8 +10,8 @@ import os
 warnings.filterwarnings("ignore")
 
 # Model ve Scaler yolları
-MODEL_PATH = "./models/model_balanced.pkl"
-SCALER_PATH = "./models/scaler/scaler_balanced.pkl"
+MODEL_PATH = "./models/Binary_Models/Model/benign_ddos_RandomForest_final.pkl"
+# SCALER_PATH = "./models/scaler/scaler_balanced.pkl"
 
 # Eşik değeri:
 THRESHOLD = 0.5
@@ -22,7 +22,7 @@ try:
     clf = joblib.load(MODEL_PATH)
     print("RandomForest Modeli Hazır!")
     print("\nScaler Yükleniyor...")
-    scaler = joblib.load(SCALER_PATH)
+    # scaler = joblib.load(SCALER_PATH)
     print("Scaler Hazır!")
     print("✅ Model ve Scaler başarıyla yüklendi!")
 except Exception as e:
@@ -116,8 +116,8 @@ def analyze_traffic(packets):
     ]], columns=FEATURE_COLUMNS)
 
     try:
-        input_scaled = scaler.transform(input_data)
-        prediction_prob = clf.predict_proba(input_scaled)[0][1]
+        # input_scaled = scaler.transform(input_data)
+        prediction_prob = clf.predict_proba(input_data)[0][1]
     except Exception as e:
         print(f"Hata: {e}")
         return

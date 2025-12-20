@@ -11,10 +11,10 @@ from collections import Counter
 from scapy.all import sniff, IP, TCP, UDP
 
 # Model Yolları
-MODEL_PATH = './models/model_balanced.pkl'
+MODEL_PATH = './models/Binary_Models/Model/benign_ddos_RandomForest_final.pkl'
 SCALER_PATH = './models/scaler/scaler_balanced.pkl'
 INTERFACE_NAME = "VMware Virtual Ethernet Adapter for VMnet1" 
-THRESHOLD = 0.50
+THRESHOLD = 0.55
 
 st.set_page_config(page_title="Ağ Trafiği Paneli", page_icon="🛡️", layout="wide")
 
@@ -121,8 +121,8 @@ def analyze_traffic_ui(packets):
     ]], columns=['Flow Duration', 'Tot Fwd Pkts', 'Tot Bwd Pkts', 'TotLen Fwd Pkts', 'TotLen Bwd Pkts', 'Fwd Pkt Len Max', 'Fwd Pkt Len Min'])
 
     try:
-        input_scaled = scaler.transform(input_data)
-        prediction_prob = clf.predict_proba(input_scaled)[0][1]
+        # input_scaled = scaler.transform(input_data)
+        prediction_prob = clf.predict_proba(input_data)[0][1]
     except:
         return None
 
