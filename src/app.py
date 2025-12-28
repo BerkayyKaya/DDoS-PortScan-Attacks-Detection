@@ -11,8 +11,10 @@ from collections import Counter
 from scapy.all import sniff, IP, TCP, UDP
 
 # Model Yolları
+# Your model paths
 MODEL_PATH = './models/Binary_Models/Model/benign_ddos_RandomForest_final.pkl'
 SCALER_PATH = './models/scaler/scaler_balanced.pkl'
+# Interface name to listen
 INTERFACE_NAME = "VMware Virtual Ethernet Adapter for VMnet1" 
 THRESHOLD = 0.55
 
@@ -134,11 +136,14 @@ def analyze_traffic_ui(packets):
     # 1 saniyede belli bir değerden fazla farklı porta giden IP var mı
     PORT_SCAN_THRESHOLD = 15 
     for ip, ports in port_scan_tracker.items():
-        if len(ports) > PORT_SCAN_THRESHOLD:
-            is_port_scan = True
-            scan_attacker = ip
-            scanned_port_count = len(ports)
-            break # ilk saldıranı bulduğunda çık
+        if ip == "192.168.172.1":
+            pass
+        else:
+            if len(ports) > PORT_SCAN_THRESHOLD:
+                is_port_scan = True
+                scan_attacker = ip
+                scanned_port_count = len(ports)
+                break # ilk saldıranı bulduğunda çık
 
     # Genel Saldırgan Bilgisi Eğer Port Scan Yoksa
     attacker_ip = "Yok"
@@ -181,16 +186,16 @@ if st.button("Sistemi Başlat", type="primary"):
             # İlk Öncelik Model Tahmininde
             if prob > THRESHOLD:
                 status_placeholder.error(
-                    f"🚨 POTANSİYEL DDoS SALDIRISI TESPİT EDİLDİ!\tKaynak: {result['attacker_ip']} -> Hedef Port: {result['target_port']}"
+                    f"POTANSİYEL SALDIRI TESPİT EDİLDİ!\tKaynak: {result['attacker_ip']} -> Hedef Port: {result['target_port']}"
                 )
-                log_type = "DDoS"
+                log_type = "Anomali"
                 log_attacker = result['attacker_ip']
                 log_target = result['target_port']
 
             # Sonraki Öncelik Port Scan Taramasında
             elif result["is_port_scan"]:
                 status_placeholder.warning(
-                    f"⚠️ POTANSİYEL PORT TARAMASI TESPİT EDİLDİ!\tKaynak: {result['scan_attacker']} -> {result['scanned_port_count']} Farklı Port Tarandı"
+                    f"POTANSİYEL PORT TARAMASI TESPİT EDİLDİ!\tKaynak: {result['scan_attacker']} -> {result['scanned_port_count']} Farklı Port Tarandı"
                 )
                 log_type = "Port Scan"
                 log_attacker = result['scan_attacker']
@@ -198,7 +203,7 @@ if st.button("Sistemi Başlat", type="primary"):
                 
             # Güvenli olduğu durum
             else:
-                status_placeholder.success("✅ Ağ Trafiği Güvenli - Arayüz İzleniyor...")
+                status_placeholder.success("Ağ Trafiği Güvenli - Arayüz İzleniyor...")
                 log_type = None
 
             # Saldırı Varsa Log Kaydı Yapılacak
@@ -207,7 +212,7 @@ if st.button("Sistemi Başlat", type="primary"):
                     "Zaman": datetime.now().strftime("%H:%M:%S"),
                     "Saldırgan IP": log_attacker,
                     "Hedef Port": log_target,
-                    "Tespit": f"AI %{prob*100:.1f}" if log_type == "DDoS" else "Kural Tabanlı",
+                    "Tespit": f"AI %{prob*100:.1f}" if log_type == "Anomali" else "Kural Tabanlı",
                     "Tür": log_type
                 }])
                 st.session_state.attack_log = pd.concat([new_log, st.session_state.attack_log], ignore_index=True)
